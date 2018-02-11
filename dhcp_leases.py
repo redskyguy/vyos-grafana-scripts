@@ -10,6 +10,9 @@ client = InfluxDBClient(db_host, port, user, password, dbname)
 
 # Reads the /config/dhcpd.leases file
 
+def xstr(s):
+    return '' if s is None else str(s)
+
 def save_influx(line):
     json_body = [
         {
@@ -53,7 +56,7 @@ while True:
             # The dhcpd.leases can sometimes contain multiple declaration for the same lease
             # This keeps track of them by the ip/mac and makes sure only the last entry is saved
             # Info here: https://linux.die.net/man/5/dhcpd.leases
-            leases_final_dict[lease_dict['ip']+lease_dict['mac']] = lease_dict
+            leases_final_dict[xstr(lease_dict.get('ip'))+xstr(lease_dict.get('mac'))] = lease_dict
             print lease_dict
     leases.close()
     client.drop_database("dhcp-leases")
